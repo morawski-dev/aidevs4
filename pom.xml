@@ -31,6 +31,7 @@
 		<spring-ai.version>1.1.7</spring-ai.version>
 		<opentelemetry-instrumentation.version>2.17.0</opentelemetry-instrumentation.version>
 		<commons-csv.version>1.11.0</commons-csv.version>
+		<spring-dotenv.version>5.1.0</spring-dotenv.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -69,6 +70,13 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
 			<version>${commons-csv.version}</version>
+		</dependency>
+
+		<!-- Loads .env into Spring's Environment at startup -->
+		<dependency>
+			<groupId>me.paulschwarz</groupId>
+			<artifactId>spring-dotenv</artifactId>
+			<version>${spring-dotenv.version}</version>
 		</dependency>
 
 		<dependency>

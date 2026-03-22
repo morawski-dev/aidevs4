@@ -1,0 +1,23 @@
+spring:
+  ai:
+    openai:
+      api-key: test-key
+      base-url: http://localhost
+      chat:
+        options:
+          model: openai/gpt-4o-mini
+
+aidevs:
+  hub:
+    url: http://localhost
+    api-key: test-key
+
+# Disable OTLP exporter in tests so it doesn't try to ship traces
+# to a non-existent collector.
+otel:
+  sdk:
+    disabled: true
+  exporter:
+    otlp:
+      endpoint: http://localhost:4317
+      headers: ""

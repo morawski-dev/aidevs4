@@ -1,3 +1,48 @@
 spring:
   application:
     name: aidevs4
+
+  ai:
+    # Disable Spring AI auto-configurations we don't use (otherwise they
+    # fail at startup demanding their own api-key).
+    model:
+      chat: openai
+      embedding: none
+      image: none
+      moderation: none
+      audio:
+        speech: none
+        transcription: none
+
+    openai:
+      api-key: ${OPENROUTER_API_KEY}
+      base-url: https://openrouter.ai/api/v1
+      chat:
+        options:
+          model: openai/gpt-4o-mini
+
+    chat:
+      observations:
+        log-prompt: true
+        log-completion: true
+
+aidevs:
+  hub:
+    url: https://hub.ag3nts.org
+    api-key: ${AIDEVS_API_KEY}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  observations:
+    annotations:
+      enable: true
+
+otel:
+  service:
+    name: aidevs4
+  exporter:
+    otlp:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+      headers: ${OTEL_EXPORTER_OTLP_HEADERS}
