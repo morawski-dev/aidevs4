@@ -16,7 +16,7 @@ spring:
 
     openai:
       api-key: ${OPENROUTER_API_KEY}
-      base-url: https://openrouter.ai/api/v1
+      base-url: https://openrouter.ai/api
       chat:
         options:
           model: openai/gpt-4o-mini
@@ -38,11 +38,23 @@ management:
   observations:
     annotations:
       enable: true
+    # Micrometer and the OTel Java agent both emit HTTP spans — drop the
+    # Micrometer ones so Langfuse traces aren't cluttered with duplicates.
+    enable:
+      http.server.requests: false
+      http.client.requests: false
 
 otel:
   service:
     name: aidevs4
+  instrumentation:
+    spring-webmvc:
+      enabled: false
+    spring-web:
+      enabled: false
   exporter:
     otlp:
-      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT}
-      headers: ${OTEL_EXPORTER_OTLP_HEADERS}
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:https://cloud.langfuse.com/api/public/otel}
+      # Headers must be a map (key: value). LANGFUSE_AUTH_HEADER = "Basic <base64(public:secret)>"
+      headers:
+        Authorization: ${LANGFUSE_AUTH_HEADER:}
