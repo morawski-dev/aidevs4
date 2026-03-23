@@ -26,23 +26,23 @@ Copy `.env.example` to `.env` and fill in:
 OPENROUTER_API_KEY=sk-or-v1-...
 AIDEVS_API_KEY=...
 OTEL_EXPORTER_OTLP_ENDPOINT=https://cloud.langfuse.com/api/public/otel
-OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic <base64(public:secret)>
+LANGFUSE_AUTH_HEADER=Basic <base64(public:secret)>
 ```
 
 `.env` is in `.gitignore` — **never commit keys**.
 
 ## Running
 
-Run a specific task by its `Task.name()`:
+Run from the **project root** (where `pom.xml` lives). On PowerShell the `-D` argument must be quoted:
 
 ```powershell
-mvn spring-boot:run -Dspring-boot.run.arguments=--task=people
+.\mvnw spring-boot:run "-Dspring-boot.run.arguments=--task=people"
 ```
 
 or from the built JAR:
 
 ```powershell
-mvn package
+.\mvnw package
 java -jar target/aidevs4-0.0.1-SNAPSHOT.jar --task=people
 ```
 
