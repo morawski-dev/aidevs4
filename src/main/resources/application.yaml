@@ -26,10 +26,20 @@ spring:
         log-prompt: true
         log-completion: true
 
+server:
+  port: 3000
+
 aidevs:
   hub:
     url: https://hub.ag3nts.org
     api-key: ${AIDEVS_API_KEY}
+  proxy:
+    # Full public URL of the /proxy endpoint (tunnel + path), e.g. https://abc123.ngrok-free.app/proxy
+    url: ${PROXY_URL:}
+    # Arbitrary alphanumeric id the Hub uses as the session id while testing
+    session-id: ${PROXY_SESSION_ID:aidevsproxy01}
+    # Tool-calling capable model on OpenRouter (bump if the light model misbehaves)
+    model: openai/gpt-4o-mini
 
 management:
   tracing:
@@ -47,6 +57,14 @@ management:
 otel:
   service:
     name: aidevs4
+  # Langfuse's OTLP endpoint only ingests traces (/v1/traces). Disable the logs and
+  # metrics exporters so they don't spam "Failed to export ... 404" against /v1/logs.
+  logs:
+    exporter: none
+  metrics:
+    exporter: none
+  traces:
+    exporter: otlp
   instrumentation:
     spring-webmvc:
       enabled: false
