@@ -40,6 +40,17 @@ aidevs:
     session-id: ${PROXY_SESSION_ID:aidevsproxy01}
     # Tool-calling capable model on OpenRouter (bump if the light model misbehaves)
     model: openai/gpt-4o-mini
+  railway:
+    # Route to activate (route_format from help: [a-z]-[0-9]{1,2}, case-insensitive)
+    route-name: ${RAILWAY_ROUTE:X-01}
+    # Status that activates (opens) the route — per help's allowed_values
+    activate-value: RTOPEN
+    # 503 retry/backoff (the API deliberately returns 503 to simulate overload)
+    max-retries: 8
+    base-backoff-ms: 2000
+    max-backoff-ms: 60000
+    # Extra wait added on top of a detected rate-limit reset window
+    rate-limit-safety-margin-ms: 500
 
 management:
   tracing:

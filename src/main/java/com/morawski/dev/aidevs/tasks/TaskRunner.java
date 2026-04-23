@@ -40,6 +40,10 @@ class TaskRunner implements ApplicationRunner {
 
         log.info("Running task: {}", taskName);
         var answer = task.solve();
+        if (task.selfSubmitting()) {
+            log.info("Task '{}' handled its own Hub communication; skipping submit. Result: {}", taskName, answer);
+            return;
+        }
         var response = hub.submit(taskName, answer);
         log.info("Hub response: {}", response);
         FlagExtractor.extract(response).ifPresent(flag -> log.info("FLAG → {}", flag));
