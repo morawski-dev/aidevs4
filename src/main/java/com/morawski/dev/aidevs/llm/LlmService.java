@@ -1,7 +1,9 @@
 package com.morawski.dev.aidevs.llm;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class LlmService {
@@ -26,5 +28,18 @@ public class LlmService {
 
     public String chat(String prompt) {
         return chat.prompt(prompt).call().content();
+    }
+
+    /**
+     * Chat with an explicit system prompt and a per-call model override (OpenRouter model id).
+     * Used where a task needs a stronger model than the global default (e.g. a prompt-engineer
+     * loop) without changing {@code application.yaml}. A blank model falls back to the default.
+     */
+    public String chat(String systemPrompt, String userPrompt, String model) {
+        var request = chat.prompt().system(systemPrompt).user(userPrompt);
+        if (StringUtils.hasText(model)) {
+            request = request.options(OpenAiChatOptions.builder().model(model).build());
+        }
+        return request.call().content();
     }
 }

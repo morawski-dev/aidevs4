@@ -51,6 +51,14 @@ aidevs:
     max-backoff-ms: 60000
     # Extra wait added on top of a detected rate-limit reset window
     rate-limit-safety-margin-ms: 500
+  categorize:
+    # Data file with the 10 items (rotates every few minutes — always refetched)
+    csv-file: categorize.csv
+    # Hard cap on batch→refine rounds. reset renews the 1.5 PP balance each attempt, so the only
+    # cost of more rounds is wall time + a cheap prompt-engineer call; give the loop room to converge.
+    max-iterations: 5
+    # Strong model used as the "prompt engineer" that rewrites the classifier prompt from Hub errors
+    engineer-model: anthropic/claude-sonnet-4-6
 
 management:
   tracing:
