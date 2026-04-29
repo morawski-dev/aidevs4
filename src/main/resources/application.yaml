@@ -59,6 +59,17 @@ aidevs:
     max-iterations: 5
     # Strong model used as the "prompt engineer" that rewrites the classifier prompt from Hub errors
     engineer-model: anthropic/claude-sonnet-4-6
+  electricity:
+    # Vision model that reads each tile's cable edges (course hint: gemini-3-flash-preview is one of the better ones)
+    vision-model: google/gemini-3-flash-preview
+    # Cap on perceive→plan→rotate→verify rounds; residual rotations are applied each round (self-correcting)
+    max-rounds: 6
+    # Upscale each cropped tile before sending to the vision model (1 = off); larger tiles read more reliably
+    tile-upscale: 4
+    # Reads per tile, taking a per-edge majority (vision calls don't cost a /verify request)
+    votes-per-tile: 3
+    # Reset the board before the first round for a deterministic start
+    reset-on-start: false
 
 management:
   tracing:

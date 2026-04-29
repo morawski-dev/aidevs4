@@ -2,7 +2,9 @@ package com.morawski.dev.aidevs.llm;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeType;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -41,5 +43,21 @@ public class LlmService {
             request = request.options(OpenAiChatOptions.builder().model(model).build());
         }
         return request.call().content();
+    }
+
+    /**
+     * Send an image plus a text prompt to a vision-capable model and parse the reply into
+     * {@code type} (structured output). The image is attached as inline media on the user message;
+     * a blank {@code model} falls back to the global default. Used by tasks that must reason over a
+     * picture (e.g. {@code electricity}, describing each puzzle tile) — the heavy vision work is
+     * delegated here so the task loop only deals with the extracted structure.
+     */
+    public <T> T extractFromImage(String userPrompt, byte[] image, MimeType mimeType, String model, Class<T> type) {
+        var request = chat.prompt()
+                .user(u -> u.text(userPrompt).media(mimeType, new ByteArrayResource(image)));
+        if (StringUtils.hasText(model)) {
+            request = request.options(OpenAiChatOptions.builder().model(model).build());
+        }
+        return request.call().entity(type);
     }
 }
