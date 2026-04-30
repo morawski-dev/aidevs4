@@ -59,6 +59,22 @@ aidevs:
     max-iterations: 5
     # Strong model used as the "prompt engineer" that rewrites the classifier prompt from Hub errors
     engineer-model: anthropic/claude-sonnet-4-6
+  failure:
+    # Hub data file with the raw plant system log (downloaded fresh each run)
+    log-file: failure.log
+    # Token ceiling for the `logs` field. Centrala's hard limit is 1500, but its tokenizer counts
+    # ~2.4% denser than our local jtokkit/cl100k (observed 1477 local == 1512 Centrala), so we aim at
+    # 1400 to leave margin.
+    token-budget: 1400
+    # Severity levels worth keeping for root-cause analysis; INFO/DEBUG/TRACE are dropped as noise.
+    levels: [WARN, ERRO, ERROR, CRIT]
+    # Known plant subsystems — used to tag events, report coverage, and map technician feedback.
+    subsystems: [ECCS8, WTRPMP, WTANK07, STMTURB12, WSTPOOL2, PWR01, FIRMWARE]
+    # Cheap model used ONLY as a fallback to paraphrase descriptions under budget (deterministic
+    # dedup + trimming usually fits without it).
+    compress-model: openai/gpt-4o-mini
+    # Hard cap on submit → read-feedback → augment rounds.
+    max-iterations: 6
   electricity:
     # Vision model that reads each tile's cable edges (course hint: gemini-3-flash-preview is one of the better ones)
     vision-model: google/gemini-3-flash-preview

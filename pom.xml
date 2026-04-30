@@ -32,6 +32,7 @@
 		<opentelemetry-instrumentation.version>2.17.0</opentelemetry-instrumentation.version>
 		<commons-csv.version>1.11.0</commons-csv.version>
 		<spring-dotenv.version>5.1.0</spring-dotenv.version>
+		<jtokkit.version>1.1.0</jtokkit.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -70,6 +71,13 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
 			<version>${commons-csv.version}</version>
+		</dependency>
+
+		<!-- Local token counting (task 8: failure log must fit in 1500 tokens). Java port of tiktoken. -->
+		<dependency>
+			<groupId>com.knuddels</groupId>
+			<artifactId>jtokkit</artifactId>
+			<version>${jtokkit.version}</version>
 		</dependency>
 
 		<!-- Loads .env into Spring's Environment at startup -->
