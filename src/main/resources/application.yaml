@@ -86,6 +86,17 @@ aidevs:
     votes-per-tile: 3
     # Reset the board before the first round for a deterministic start
     reset-on-start: false
+  mailbox:
+    # Tool-calling agent model. Course hint: a cheap model is enough (search + fact extraction),
+    # but it MUST support tool calling. gpt-4o-mini is the proven tool-caller in this stack
+    # (task03 proxy); swap to google/gemini-3-flash-preview if you prefer the course's suggestion.
+    model: openai/gpt-4o-mini
+    # Outer re-prompt rounds. The mailbox is active, so we keep searching/retrying on Hub feedback.
+    max-iterations: 8
+    # Page size for search/getInbox (the zmail API allows 5-20).
+    per-page: 20
+    # Short pause between outer rounds — gives new mail time to arrive.
+    retry-pause-ms: 1500
 
 management:
   tracing:
