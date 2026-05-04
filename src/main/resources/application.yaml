@@ -97,6 +97,20 @@ aidevs:
     per-page: 20
     # Short pause between outer rounds — gives new mail time to arrive.
     retry-pause-ms: 1500
+  drone:
+    # Vision model that locates the dam sector on the map. Counting the grid accurately is the gate,
+    # so the course recommends a strong model (openai/gpt-5.4 is best at grid counting; gpt-4o also good).
+    vision-model: openai/gpt-4o
+    # Model that builds the flight instructions from the docs + dam sector + Hub feedback (blank = default).
+    planner-model: openai/gpt-4o-mini
+    # Hard cap on submit → read-error → correct rounds.
+    max-iterations: 8
+    # The Żarnowiec power plant's identification code — the nominal/decoy destination.
+    plant-code: PWR6132PL
+    # The map endpoint rotates between an annotated frame (red grid + boosted water, parseable) and a
+    # raw frame (no grid) in multi-minute windows; retry past raw frames long enough to span one.
+    map-retries: 60
+    map-retry-pause-ms: 4000
 
 management:
   tracing:
