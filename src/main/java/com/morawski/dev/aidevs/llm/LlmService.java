@@ -28,6 +28,21 @@ public class LlmService {
                 .entity(type);
     }
 
+    /**
+     * Structured output with a per-call model override (OpenRouter model id). Mirrors
+     * {@link #chat(String, String, String)} but parses the reply into {@code type} via Spring AI's
+     * {@code response_format}. A blank {@code model} falls back to the global default. Used where a
+     * task wants a specific model for a structured step (e.g. {@code drone}'s instruction planner)
+     * without changing {@code application.yaml}.
+     */
+    public <T> T extract(String systemPrompt, String userPrompt, String model, Class<T> type) {
+        var request = chat.prompt().system(systemPrompt).user(userPrompt);
+        if (StringUtils.hasText(model)) {
+            request = request.options(OpenAiChatOptions.builder().model(model).build());
+        }
+        return request.call().entity(type);
+    }
+
     public String chat(String prompt) {
         return chat.prompt(prompt).call().content();
     }
