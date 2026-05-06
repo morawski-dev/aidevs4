@@ -111,6 +111,15 @@ aidevs:
     # raw frame (no grid) in multi-minute windows; retry past raw frames long enough to span one.
     map-retries: 60
     map-retry-pause-ms: 4000
+  evaluation:
+    # Public Hub archive with ~10 000 sensor JSON files (absolute path, no apikey; unzipped in-memory).
+    zip-file: /dane/sensors.zip
+    # Model that classifies operator notes (anomaly type 3). Deterministic dedup collapses 10k files to a
+    # few dozen distinct notes, so a strong model costs almost nothing here — and scoring is exact-set
+    # match, so accuracy on the ambiguous OK/problem boundary matters more than token cost.
+    classify-model: anthropic/claude-sonnet-4-6
+    # Distinct notes per LLM call; small batches keep the model's 1-based index output reliable.
+    note-batch-size: 40
 
 management:
   tracing:

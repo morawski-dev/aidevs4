@@ -42,4 +42,17 @@ public class HubClient {
                 .retrieve()
                 .body(byte[].class);
     }
+
+    /**
+     * Download a public Hub file by its absolute path (no apikey in the URL). Some task inputs live under
+     * {@code /dane/...} rather than the per-apikey {@code /data/{apikey}/...} space — e.g. task11's
+     * {@code /dane/sensors.zip}. The {@code path} is resolved against the Hub base url.
+     */
+    public byte[] downloadPublic(String path) {
+        log.info("GET {}", path);
+        return http.get()
+                .uri(path)
+                .retrieve()
+                .body(byte[].class);
+    }
 }
