@@ -111,6 +111,17 @@ aidevs:
     # raw frame (no grid) in multi-minute windows; retry past raw frames long enough to span one.
     map-retries: 60
     map-retry-pause-ms: 4000
+  firmware:
+    # Tool-calling agent model. Course hint: this task needs reasoning + adaptation to a non-standard
+    # shell API, so a strong model matters — anthropic/claude-sonnet-4-6 tracks context and recovers
+    # from unexpected API replies far better than light models (which loop or confuse commands).
+    model: anthropic/claude-sonnet-4-6
+    # Outer re-prompt rounds — keep the agent going after a stall, a ban wait, or partial exploration.
+    max-iterations: 6
+    # Bounded retries inside ShellClient for deliberately retryable statuses (429 rate limit / 503).
+    max-retries: 5
+    # Pause between outer rounds (and the unit of ShellClient's linear backoff).
+    retry-pause-ms: 2000
   evaluation:
     # Public Hub archive with ~10 000 sensor JSON files (absolute path, no apikey; unzipped in-memory).
     zip-file: /dane/sensors.zip
