@@ -131,6 +131,18 @@ aidevs:
     classify-model: anthropic/claude-sonnet-4-6
     # Distinct notes per LLM call; small batches keep the model's 1-based index output reliable.
     note-batch-size: 40
+  reactor:
+    # Hard cap on commands per run (each command = one /verify round-trip). The board is 7 wide, so a
+    # clean traverse is ~6-12 commands; the cap absorbs waits/reroutes/resets.
+    max-commands: 200
+    # How many times the run may reset (after a crush/stall) before giving up.
+    max-resets: 10
+    # Bounded retries for deliberately retryable statuses (429 rate limit / 503 overload).
+    max-retries: 5
+    # Unit of the client's linear backoff between retries (ms).
+    backoff-ms: 1000
+    # Read-only probe mode: start + a few waits, just log raw bodies to learn the board JSON shape.
+    recon: false
 
 management:
   tracing:
