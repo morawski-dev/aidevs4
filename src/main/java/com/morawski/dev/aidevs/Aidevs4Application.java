@@ -22,6 +22,8 @@ public class Aidevs4Application {
     }
 
     private static boolean needsWebServer(String[] args) {
-        return Arrays.stream(args).anyMatch("--task=proxy"::equals);
+        // Servlet tasks: the Hub/agent calls back into our @RestControllers, so the embedded server
+        // must stay up. proxy (S01E03) and negotiations (S03E04) both expose live tool endpoints.
+        return Arrays.stream(args).anyMatch(a -> "--task=proxy".equals(a) || "--task=negotiations".equals(a));
     }
 }

@@ -131,6 +131,26 @@ aidevs:
     classify-model: anthropic/claude-sonnet-4-6
     # Distinct notes per LLM call; small batches keep the model's 1-based index output reliable.
     note-batch-size: 40
+  negotiations:
+    # Full public URL of the tool endpoint (tunnel + path), registered with the Hub,
+    # e.g. https://abc123.ngrok-free.app/api/negotiations
+    url: ${NEGOTIATIONS_URL:}
+    # Model that picks the catalog item from the agent's paraphrased request. The request reads units and
+    # negation, so a strong model is used (exact-set scoring on cities, so a wrong item = wrong answer).
+    match-model: anthropic/claude-sonnet-4-6
+    # Catalog candidates the lexical pre-filter hands to the model per lookup (keeps the prompt small).
+    shortlist-size: 35
+    # Cap on the output string (UTF-8). The whole tool reply must stay under 500 bytes; 450 leaves room
+    # for the {"output":"..."} JSON wrapper and any escaping.
+    max-output-bytes: 450
+    # How many times solve() polls /verify {action:check} for the asynchronous flag.
+    max-checks: 40
+    # Pause between checks (verification is asynchronous; the agent needs ~30-60s+ to run).
+    check-pause-ms: 5000
+    # Public Hub paths for the three S03E04 knowledge files.
+    cities-file: /dane/s03e04_csv/cities.csv
+    items-file: /dane/s03e04_csv/items.csv
+    connections-file: /dane/s03e04_csv/connections.csv
   reactor:
     # Hard cap on commands per run (each command = one /verify round-trip). The board is 7 wide, so a
     # clean traverse is ~6-12 commands; the cap absorbs waits/reroutes/resets.
