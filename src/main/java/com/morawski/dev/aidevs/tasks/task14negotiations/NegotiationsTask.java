@@ -30,13 +30,12 @@ class NegotiationsTask implements Task {
     /**
      * Tool description sent to the Hub — this is the agent's only instruction on when to call us and what
      * to pass. Must say: one item per call, free-text in {@code params}, returns the offering cities.
+     * The Hub caps this field at 300 characters, so it's kept tight.
      */
     private static final String TOOL_DESCRIPTION = """
-            Wyszukiwarka dostępności przedmiotów w miastach. Zwraca nazwy miast (oddzielone przecinkami), \
-            w których można KUPIĆ podany przedmiot. W polu params przekaż nazwę lub opis JEDNEGO przedmiotu \
-            w języku naturalnym, np. "rezystor 1 ohm 0.125W" albo "kabel o długości 10 metrów". \
-            Aby znaleźć miasta oferujące kilka przedmiotów jednocześnie, wywołaj to narzędzie osobno dla \
-            każdego przedmiotu i znajdź część wspólną zwróconych list miast.""";
+            Zwraca nazwy miast (po przecinku), w których można kupić dany przedmiot. W polu params podaj \
+            opis JEDNEGO przedmiotu w języku naturalnym, np. 'rezystor 1 ohm' lub 'kabel 10 m'. \
+            Dla kilku przedmiotów wywołaj osobno i przetnij listy miast.""";
 
     private final NegotiationsClient client;
     private final NegotiationsService service;
@@ -74,6 +73,12 @@ class NegotiationsTask implements Task {
         var answer = Map.of("tools", List.of(tool));
         log.info("Registering negotiations tool: {}", props.url());
         var submitResp = client.submit(answer);
+        if (!submitResp.ok()) {
+            // e.g. description over 300 chars, or a malformed tools array — don't poll a registration
+            // that never landed.
+            log.error("Tool registration was rejected (HTTP {}): {}", submitResp.status(), submitResp.body());
+            return Map.of("status", "registration rejected", "http", submitResp.status(), "body", submitResp.body());
+        }
         var earlyFlag = submitResp.flag();
         if (earlyFlag.isPresent()) {
             log.info("FLAG → {}", earlyFlag.get());
