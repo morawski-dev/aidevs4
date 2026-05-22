@@ -151,6 +151,19 @@ aidevs:
     cities-file: /dane/s03e04_csv/cities.csv
     items-file: /dane/s03e04_csv/items.csv
     connections-file: /dane/s03e04_csv/connections.csv
+  savethem:
+    # Tool-calling recon agent model. This task needs reasoning over discovered tools and rule notes,
+    # so a strong model is used (the route itself is computed deterministically, not by the LLM).
+    model: anthropic/claude-sonnet-4-6
+    # Outer re-prompt rounds before giving up on gathering findings.
+    max-iterations: 12
+    # Chat-memory window (lots of tool round-trips during discovery).
+    memory-window: 120
+    # Resource budgets for the whole journey (from the task brief): 10 fuel + 10 food.
+    fuel-budget: 10
+    food-budget: 10
+    # Extra fuel a powered mode (car/rocket) burns entering a tree (T) tile (from the trees-and-burn note).
+    tree-penalty: 0.2
   reactor:
     # Hard cap on commands per run (each command = one /verify round-trip). The board is 7 wide, so a
     # clean traverse is ~6-12 commands; the cap absorbs waits/reroutes/resets.
