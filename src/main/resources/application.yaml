@@ -164,6 +164,20 @@ aidevs:
     food-budget: 10
     # Extra fuel a powered mode (car/rocket) burns entering a tree (T) tile (from the trees-and-burn note).
     tree-penalty: 0.2
+  okoeditor:
+    # Record IDs read from the OKO web panel (oko.ag3nts.org list pages) — the update-only/write-only
+    # API can't list records, so IDs aren't discoverable through it. The Skolwin report (incydenty) and
+    # task (zadania) share one id; the Komarowo report repurposes a spare incident (the API only
+    # updates existing records — a brand-new id returns -880).
+    skolwin-id: 380792b2c86d9c5be670b3bde48e187b
+    komarowo-incident-id: 351c0d9c90d66b4c040fff1259dd191d
+    # 6-char title codes (4-char type + 2-digit subtype): MOVE04 = animals, MOVE01 = human movement.
+    animals-code: MOVE04
+    human-movement-code: MOVE01
+    # Bounded retries inside OkoClient for deliberately retryable statuses (429 rate limit / 503).
+    max-retries: 5
+    # Unit of OkoClient's linear backoff between retries.
+    retry-pause-ms: 2000
   reactor:
     # Hard cap on commands per run (each command = one /verify round-trip). The board is 7 wide, so a
     # clean traverse is ~6-12 commands; the cap absorbs waits/reroutes/resets.
