@@ -43,6 +43,28 @@ public class LlmService {
         return request.call().entity(type);
     }
 
+    /**
+     * Structured output with a per-call model override and an explicit {@code max_tokens} cap. Some
+     * providers (OpenRouter) reject a request whose requested completion budget exceeds the account's
+     * affordable tokens; capping it keeps small structured extractions affordable. A blank {@code model}
+     * falls back to the default; a non-positive {@code maxTokens} leaves the provider default in place.
+     */
+    public <T> T extract(String systemPrompt, String userPrompt, String model, int maxTokens, Class<T> type) {
+        var options = OpenAiChatOptions.builder();
+        if (StringUtils.hasText(model)) {
+            options.model(model);
+        }
+        if (maxTokens > 0) {
+            options.maxTokens(maxTokens);
+        }
+        return chat.prompt()
+                .system(systemPrompt)
+                .user(userPrompt)
+                .options(options.build())
+                .call()
+                .entity(type);
+    }
+
     public String chat(String prompt) {
         return chat.prompt(prompt).call().content();
     }
