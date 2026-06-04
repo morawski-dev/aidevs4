@@ -213,6 +213,35 @@ aidevs:
     # Vision fallback (only used if getMap doesn't encode building height unambiguously).
     vision-model: anthropic/claude-sonnet-4-6
     preview-url: https://hub.ag3nts.org/domatowo_preview
+  foodwarehouse:
+    # Public Hub path to the city-needs JSON ({city: {item: qty}}); downloaded via downloadPublic.
+    food-file: /dane/food4cities.json
+    # Order title template (String.format), given the city name. Title format is not strictly validated.
+    title-template: "Dostawa dla %s"
+    # Role whose users may create transport orders. role_id 2 = "Obsługa transportów" (every seeded
+    # order's creator has this role); create rejects creators outside it.
+    transport-role-id: 2
+    # Bounded retries inside FoodWarehouseClient for deliberately retryable statuses (429 / 503).
+    max-retries: 5
+    # Unit of FoodWarehouseClient's linear backoff between retries.
+    retry-pause-ms: 2000
+  filesystem:
+    # Public Hub archive with Natan's notes (absolute path, no apikey; unzipped in-memory).
+    notes-zip: /dane/natan_notes.zip
+    # Model that reads the free-form Polish notes into the structured trade model. Needs semantic
+    # reading (merging split first-name/surname mentions, singularising irregular Polish nouns), so a
+    # strong model is used; the build/submit is deterministic.
+    model: anthropic/claude-sonnet-4-6
+    # Completion-token cap for the extraction. The structured output is small (~8 cities), and OpenRouter
+    # 402s a request whose default budget (65536) exceeds the account's affordable tokens.
+    max-tokens: 8000
+    # Max actions per /verify batch (the API runs an array sequentially). ~32 actions total, so one
+    # batch normally; chunked for safety.
+    batch-size: 200
+    # Bounded retries inside FsClient for deliberately retryable statuses (429 rate limit / 503).
+    max-retries: 5
+    # Unit of FsClient's linear backoff between retries (ms).
+    retry-pause-ms: 2000
   reactor:
     # Hard cap on commands per run (each command = one /verify round-trip). The board is 7 wide, so a
     # clean traverse is ~6-12 commands; the cap absorbs waits/reroutes/resets.
