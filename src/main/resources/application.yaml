@@ -122,6 +122,19 @@ aidevs:
     max-retries: 5
     # Pause between outer rounds (and the unit of ShellClient's linear backoff).
     retry-pause-ms: 2000
+  shellaccess:
+    # Tool-calling agent model. The agent must cross-reference the /data logs and apply the "day before"
+    # date trap, so a strong reasoning model is used — anthropic/claude-sonnet-4-6.
+    model: anthropic/claude-sonnet-4-6
+    # Completion-token cap per turn. Per-turn output (a tool call + short reasoning) is small, and
+    # OpenRouter 402s a request whose default budget (65536) exceeds the account's affordable tokens.
+    max-tokens: 8000
+    # Outer re-prompt rounds — keep the agent going after a stall or partial exploration.
+    max-iterations: 8
+    # Bounded retries inside ShellAccessClient for deliberately retryable statuses (429 rate limit / 503).
+    max-retries: 5
+    # Pause between outer rounds (and the unit of ShellAccessClient's linear backoff).
+    retry-pause-ms: 2000
   evaluation:
     # Public Hub archive with ~10 000 sensor JSON files (absolute path, no apikey; unzipped in-memory).
     zip-file: /dane/sensors.zip
@@ -256,6 +269,85 @@ aidevs:
     backoff-ms: 1000
     # Read-only probe mode: start + a few waits, just log raw bodies to learn the board JSON shape.
     recon: false
+  goingthere:
+    # Hard cap on move commands per run (a clean traverse is 11; the cap absorbs restarts/reroutes).
+    max-moves: 60
+    # How many times the run may start over (after a crash) before giving up.
+    max-restarts: 10
+    # Bounded retries for retryable statuses (429/503) and corrupted scanner/hint reads.
+    max-retries: 8
+    # Unit of the client's linear backoff between retries (ms).
+    backoff-ms: 1000
+    # Model for the radio-hint classifier. The mapping (port/starboard/bow -> left/right/front) is simple,
+    # so a cheap model is enough; keep it cheap since it runs once per move.
+    hint-model: openai/gpt-4o-mini
+    # Completion-token cap for the classifier (output is a 1-word side). Also dodges OpenRouter 402s when
+    # the default 65536 budget exceeds the account's affordable tokens.
+    hint-max-tokens: 100
+    # Row-number change of the `left` command: -1 if "left" goes to a lower row number, +1 otherwise.
+    # CONFIRM with a recon run; only affects row convergence, never crash safety.
+    left-row-delta: -1
+    # Read-only probe mode: start + a few scanner/getmessage reads, just log raw bodies to learn shapes.
+    recon: false
+  radiomonitoring:
+    # Vision model that OCRs text out of image attachments (the router only sends true images here).
+    vision-model: openai/gpt-4o
+    # Audio-capable model for transcribing audio attachments (sent as an input_audio part). Must accept
+    # audio input on OpenRouter (Gemini multimodal models do).
+    audio-model: google/gemini-3-flash-preview
+    # Strong model for the single-shot synthesis of the 4 report fields (accuracy matters; exact-match scoring).
+    synth-model: anthropic/claude-sonnet-4-6
+    # Completion-token cap for the synthesis (output is tiny; avoids OpenRouter's 402 on the default 65536 budget).
+    synth-max-tokens: 2000
+    # Safety cap on the listen loop (the terminal "enough data" signal normally ends it first).
+    max-listens: 100
+    # Bounded retries inside RadiomonitoringClient for deliberately retryable statuses (429 / 503).
+    max-retries: 5
+    # Unit of RadiomonitoringClient's linear backoff between retries.
+    retry-pause-ms: 2000
+    # true = compute and log the report but skip transmit (first-run inspection of routing + facts).
+    dry-run: false
+  phonecall:
+    # Hard cap on dialog turns in one conversation (safety net against loops).
+    max-turns: 14
+    # Re-start the whole scenario this many times if the conversation gets "burned".
+    max-restarts: 3
+    # Pause between restart attempts (ms) — the operator's suspicion ramps under rapid repeated sessions.
+    restart-pause-ms: 12000
+    # Identity we introduce as (brief).
+    operator-name: "Tymon Gajewski"
+    # Operators' secret password, given only when the operator asks to authenticate.
+    password: "BARBAKAN"
+    # Fallback model for classifying the operator's intent / resolving the passable road when the
+    # deterministic keyword pass is ambiguous (negation-heavy replies). Blank = global default.
+    classify-model: anthropic/claude-sonnet-4-6
+  timetravel:
+    # Recon mode: help + getConfig + a sample configure, just log raw bodies to learn the API contract
+    # (field names, flux shape, stabilization hint, where the flag appears). Flip to false for the run.
+    recon: false
+    # Interactive mode: pause on stdin so the assistant can guide the operator step by step through the
+    # manual preview toggles. Set false to only print instructions (no blocking) for a dry run / CI.
+    interactive: true
+    # Poll cadence and hard cap for the "wait until internalMode matches and flux=100%" loop. internalMode
+    # cycles every few seconds, so ~1.5 s between getConfig reads is plenty.
+    poll-interval-ms: 1500
+    max-poll-attempts: 60
+    # Today's date = the "present" we return to before opening the tunnel.
+    present-date: "2026-06-15"
+    # Jump into the future for fresh batteries.
+    battery-date: "2238-11-05"
+    # Tunnel target: the day before Rafał was found in the cave.
+    rafal-date: "2024-11-12"
+
+  # Audio layer (TTS + STT). OpenRouter doesn't serve TTS/Whisper, so this points at OpenAI directly
+  # with its own key (OPENAI_API_KEY). Used by the phonecall task.
+  audio:
+    api-key: ${OPENAI_API_KEY:}
+    base-url: https://api.openai.com
+    tts-model: gpt-4o-mini-tts
+    tts-voice: onyx
+    stt-model: gpt-4o-transcribe
+    language: pl
 
 management:
   tracing:
