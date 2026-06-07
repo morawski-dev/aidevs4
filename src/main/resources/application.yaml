@@ -181,13 +181,15 @@ aidevs:
   windpower:
     # Recon mode: probe the API (help + start + documentation + queue weather/turbinecheck/powerplantcheck
     # + getResult + one unlock probe) and log raw bodies to learn report shapes. Flip to false for the timed flow.
-    recon: true
-    # Time budget for the whole start→done flow, with margin under the hard 40 s limit.
-    deadline-ms: 34000
+    recon: false
+    # Time budget for the poll loops, kept just under the hard 40 s session limit. The weather report is
+    # the long pole (~24 s to generate in recon), so the budget must comfortably exceed that; the actual
+    # flow finishes ~27 s (weather ~24 s + unlock ~2 s + config/done).
+    deadline-ms: 38000
     # Pause between getResult polls while waiting for queued reports to finish generating.
     poll-interval-ms: 400
-    # Hard cap on getResult polls (safety net so an empty queue can't loop forever).
-    max-poll-attempts: 80
+    # Hard cap on getResult polls (safety net so an empty queue can't loop forever); ~200 spans the budget.
+    max-poll-attempts: 200
     # Blade pitch that offers no resistance in a storm (feathered) vs. optimal pitch for production.
     # DOSTROIĆ z reconu — the real allowed values come from help / the turbine report.
     feather-pitch: 90
