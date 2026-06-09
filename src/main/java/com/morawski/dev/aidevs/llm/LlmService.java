@@ -83,6 +83,28 @@ public class LlmService {
     }
 
     /**
+     * Chat with a per-call model override and an explicit {@code max_tokens} cap, returning plain text.
+     * Used where the caller wants free-text output (e.g. JSON it will parse leniently itself, tolerating
+     * a model that prepends reasoning) without the strict {@code BeanOutputConverter}, while still
+     * capping the budget so OpenRouter doesn't 402 on the default. Blank model / non-positive cap fall back.
+     */
+    public String chat(String systemPrompt, String userPrompt, String model, int maxTokens) {
+        var options = OpenAiChatOptions.builder();
+        if (StringUtils.hasText(model)) {
+            options.model(model);
+        }
+        if (maxTokens > 0) {
+            options.maxTokens(maxTokens);
+        }
+        return chat.prompt()
+                .system(systemPrompt)
+                .user(userPrompt)
+                .options(options.build())
+                .call()
+                .content();
+    }
+
+    /**
      * Send an image plus a text prompt to a vision-capable model and parse the reply into
      * {@code type} (structured output). The image is attached as inline media on the user message;
      * a blank {@code model} falls back to the global default. Used by tasks that must reason over a
@@ -96,5 +118,22 @@ public class LlmService {
             request = request.options(OpenAiChatOptions.builder().model(model).build());
         }
         return request.call().entity(type);
+    }
+
+    /**
+     * Attach a media file (e.g. audio) plus a text prompt to an audio-capable model and return the
+     * plain-text reply (transcription). Unlike {@link #extractFromImage} this returns free text rather
+     * than structured output — audio-preview models may not support {@code response_format} json schema
+     * alongside an audio input. The {@code mimeType} must be one the provider maps to an
+     * {@code input_audio} part (use {@code audio/mp3} or {@code audio/wav}). A blank {@code model}
+     * falls back to the default.
+     */
+    public String transcribe(String userPrompt, byte[] media, MimeType mimeType, String model) {
+        var request = chat.prompt()
+                .user(u -> u.text(userPrompt).media(mimeType, new ByteArrayResource(media)));
+        if (StringUtils.hasText(model)) {
+            request = request.options(OpenAiChatOptions.builder().model(model).build());
+        }
+        return request.call().content();
     }
 }
