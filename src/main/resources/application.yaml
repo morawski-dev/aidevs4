@@ -284,6 +284,9 @@ aidevs:
     # Completion-token cap for the classifier (output is a 1-word side). Also dodges OpenRouter 402s when
     # the default 65536 budget exceeds the account's affordable tokens.
     hint-max-tokens: 100
+    # The radio channel is jammed (single hints are unreliable), so re-request + re-classify each hint
+    # this many times and majority-vote the side.
+    hint-samples: 5
     # Row-number change of the `left` command: -1 if "left" goes to a lower row number, +1 otherwise.
     # CONFIRM with a recon run; only affects row convergence, never crash safety.
     left-row-delta: -1
