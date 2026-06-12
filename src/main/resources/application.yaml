@@ -270,10 +270,12 @@ aidevs:
     # Read-only probe mode: start + a few waits, just log raw bodies to learn the board JSON shape.
     recon: false
   goingthere:
-    # Hard cap on move commands per run (a clean traverse is 11; the cap absorbs restarts/reroutes).
-    max-moves: 60
+    # Hard cap on TOTAL move commands across all restarts. The radio channel is jammed: a minority of
+    # hints are simply wrong and can't be told apart, so a run survives by luck — we keep restarting (the
+    # map re-rolls each start) until one clean traverse lands. ~0.85^11 ≈ 17% per run, so give it room.
+    max-moves: 3000
     # How many times the run may start over (after a crash) before giving up.
-    max-restarts: 10
+    max-restarts: 250
     # Bounded retries for retryable statuses (429/503) and corrupted scanner/hint reads.
     max-retries: 8
     # Unit of the client's linear backoff between retries (ms).
@@ -284,9 +286,9 @@ aidevs:
     # Completion-token cap for the classifier (output is a 1-word side). Also dodges OpenRouter 402s when
     # the default 65536 budget exceeds the account's affordable tokens.
     hint-max-tokens: 100
-    # The radio channel is jammed (single hints are unreliable), so re-request + re-classify each hint
-    # this many times and majority-vote the side.
-    hint-samples: 5
+    # Re-request + re-classify each hint this many times and majority-vote — guards against the rare
+    # classifier flip on borderline phrasing (the hint's meaning is stable per column, so a few suffice).
+    hint-samples: 3
     # Row-number change of the `left` command: -1 if "left" goes to a lower row number, +1 otherwise.
     # CONFIRM with a recon run; only affects row convergence, never crash safety.
     left-row-delta: -1

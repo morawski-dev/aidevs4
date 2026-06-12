@@ -9,6 +9,9 @@ target/
 .env.local
 *.env.local
 
+### Local run/recon logs (scratch output from running tasks) ###
+*.log
+
 ### STS ###
 .apt_generated
 .classpath
