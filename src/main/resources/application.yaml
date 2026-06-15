@@ -178,6 +178,41 @@ aidevs:
     max-retries: 5
     # Unit of OkoClient's linear backoff between retries.
     retry-pause-ms: 2000
+  windpower:
+    # Recon mode: probe the API (help + start + documentation + queue weather/turbinecheck/powerplantcheck
+    # + getResult + one unlock probe) and log raw bodies to learn report shapes. Flip to false for the timed flow.
+    recon: true
+    # Time budget for the whole start→done flow, with margin under the hard 40 s limit.
+    deadline-ms: 34000
+    # Pause between getResult polls while waiting for queued reports to finish generating.
+    poll-interval-ms: 400
+    # Hard cap on getResult polls (safety net so an empty queue can't loop forever).
+    max-poll-attempts: 80
+    # Blade pitch that offers no resistance in a storm (feathered) vs. optimal pitch for production.
+    # DOSTROIĆ z reconu — the real allowed values come from help / the turbine report.
+    feather-pitch: 90
+    production-pitch: 0
+    # turbineMode values from help: 'production' enables generation, 'idle' disables the turbine.
+    idle-mode: idle
+    production-mode: production
+  domatowo:
+    # Read-only probe mode: help + getMap, just log raw bodies to learn the API contract / map legend.
+    # Flip to false to run the actual search-and-rescue operation.
+    recon: false
+    # Action-point budget for the whole operation (brief: 300).
+    max-actions: 300
+    # Unit caps (brief: 8 scouts, 4 transporters).
+    max-scouts: 8
+    max-transporters: 4
+    # Hard cap on action round-trips in one run (safety net against loops).
+    max-rounds: 400
+    # Bounded retries for deliberately retryable statuses (429 rate limit / 503 overload).
+    max-retries: 5
+    # Unit of the client's linear backoff between retries (ms).
+    backoff-ms: 1000
+    # Vision fallback (only used if getMap doesn't encode building height unambiguously).
+    vision-model: anthropic/claude-sonnet-4-6
+    preview-url: https://hub.ag3nts.org/domatowo_preview
   reactor:
     # Hard cap on commands per run (each command = one /verify round-trip). The board is 7 wide, so a
     # clean traverse is ~6-12 commands; the cap absorbs waits/reroutes/resets.
