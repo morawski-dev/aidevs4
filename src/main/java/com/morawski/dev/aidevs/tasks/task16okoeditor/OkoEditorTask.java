@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * S05E01 ({@code okoeditor}) — make changes to the OKO Operations Center through the Centrala's
+ * S04E01 ({@code okoeditor}) — make changes to the OKO Operations Center through the Centrala's
  * {@code /verify} API (the "backdoor"); manual edits in the web panel ({@code https://oko.ag3nts.org/})
  * are forbidden. Three required edits, then {@code done}:
  * <ol>
