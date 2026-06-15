@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * S05 ({@code domatowo}) — find a partisan hiding in one of the tallest buildings of a bombed 11×11
+ * S04E03 ({@code domatowo}) — find a partisan hiding in one of the tallest buildings of a bombed 11×11
  * city and call a rescue helicopter to his cell, within a 300-action-point budget.
  *
  * <p>The audio clue ("ukryłem się w jednym z najwyższych bloków") pins the search to the tallest
